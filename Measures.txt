@@ -1,0 +1,363 @@
+Bar colour 11 = if([Total Sales]>=1000000,"#A4DD00","#E78F81")
+
+cf colour = if([Total Sales]<0,"Red","green")
+-------------------------------------------------------------
+MOM changes in Millions = 
+VAR mo = ([Total Sales] - [pervious Month sale])/[pervious Month sale]
+
+var mo1 = 
+FORMAT(mo, "▲0.00;▼0.00")
+
+RETURN
+
+IF(mo1="inf","",mo1)
+
+-------------------------------------------------------------------------
+
+MoM Color = 
+VAR mo = ([Total Sales] - [pervious Month sale]) / [pervious Month sale]
+RETURN
+IF(mo < 0, "Red", "Green")
+
+--------------------------------------------------------------------------------
+
+pervious Month sale = CALCULATE([Total Sales],PREVIOUSMONTH('Calendar Table'[Date]))
+
+------------------------------------------------------------------------
+
+Previous Quarter Sale = 
+CALCULATE(
+    [Total Sales],
+    PREVIOUSQUARTER('Calendar Table'[Date])
+)
+
+----------------------------------------------------------------------
+
+QoQ Changes in Millions = 
+VAR qoq = ([Total Sales] - [Previous Quarter Sale]) / [Previous Quarter Sale]
+VAR qoq1 = 
+FORMAT(qoq, "▲0.00;▼0.00")
+RETURN
+IF(qoq1="inf","",qoq1)
+
+----------------------------------------------------------------------------------------
+
+QoQ Color = 
+VAR PrevSales = [Previous Quarter Sale]
+VAR CurrentSales = [Total Sales]
+VAR qoq = 
+    IF(
+        PrevSales <> 0 && NOT ISBLANK(PrevSales) && NOT ISBLANK(CurrentSales),
+        (CurrentSales - PrevSales) / PrevSales,
+        BLANK()
+    )
+VAR qqq = 
+SWITCH(
+    TRUE(),
+    ISBLANK(qoq), "Green",  -- For cases with no valid data
+    qoq > 0, "Green",
+    qoq <= 0, "Red"
+)
+
+RETURN
+
+if(qqq= "inf","White",qqq)
+
+-----------------------------------------------------------------------------------------------------
+Sale difference = [Total Sales]-[Previous Quarter Sale]
+
+------------------------------------------------------------------------------------------------------
+pervious Quater Profit = CALCULATE([Total Profit],PREVIOUSQUARTER('Calendar Table'[Date]))
+
+Profit difference = [Total Profit]-[pervious Quater Profit]
+
+------------------------------------------------------------------------------------
+
+QoQ Changes in Millions P = 
+VAR qoq = ([Total Profit] - [pervious Quater Profit]) / [pervious Quater Profit]
+VAR qoq1 = 
+FORMAT(qoq, "▲0.00;▼0.00")
+RETURN
+IF(qoq1="inf","",qoq1)
+
+----------------------------------------------------------------------------------
+
+QoQ profit Color = 
+VAR PrevProfit = [pervious Quater Profit]
+VAR CurrentProfit = [Total Profit]
+VAR qoq = 
+    IF(
+        PrevProfit <> 0 && NOT ISBLANK(PrevProfit) && NOT ISBLANK(CurrentProfit),
+        (CurrentProfit - PrevProfit) / PrevProfit,
+        BLANK()
+    )
+VAR qqq = 
+SWITCH(
+    TRUE(),
+    ISBLANK(qoq), "Green",  -- For cases with no valid data
+    qoq > 0, "Green",
+    qoq <= 0, "Red"
+)
+
+RETURN
+
+if(qqq= "inf","White",qqq)
+
+----------------------------------------------------------------------------------
+
+AOV = [Total Sales] / [Total Orders]
+Avg Shipping Cost = AVERAGE(Orders[Shipping Cost])
+Bar colour = if([Total Profit]>=0,"#A4DD00","#E78F81")
+Bar profit margin = IF([Total Profit]>0,"#9071CE","#FF7D29")
+Customer Count = DISTINCTCOUNT(Orders[Customer ID])
+First Class = CALCULATE([Total Orders],Orders[Ship Mode]="First Class")
+Formate TS = FORMAT([Total Sales]/1000000, "0.00") & "M"
+Profit Margin = ([Total Profit]/[Total Sales])
+Profit Margin 1 = ([Total Profit]/[Total Sales])
+Return order = CALCULATE(DISTINCTCOUNT(Returns[Order ID]),ALLSELECTED(Returns))
+Returning Rate = DIVIDE([Return order],[Total Orders])
+Same Day = CALCULATE([Total Orders],Orders[Ship Mode]="Same Day")
+Second Class = CALCULATE([Total Orders],Orders[Ship Mode]="Second Class")
+Standard Class = CALCULATE([Total Orders],Orders[Ship Mode]="Standard Class")
+Total Country = DISTINCTCOUNT(Orders[Country])
+Total Orders = DISTINCTCOUNT(Orders[Order ID])
+Total Profit = SUMX(VALUES(Orders[Order ID]),CALCULATE(SUM(Orders[Profit])))
+total sale TF = FORMAT([Total Sales]/1000000,"0.00")&"M"
+Total Sales = SUM(Orders[Sales])
+
+--------------------------------------------------------------------------------
+
+Total Sales (Last Point Only) = 
+VAR CurrentYear = SELECTEDVALUE('Calendar Table'[Year])
+VAR CurrentQuarter = SELECTEDVALUE('Calendar Table'[Quater])
+
+VAR LastYear = CALCULATE(
+    MAX('Calendar Table'[Year]),
+    ALLSELECTED('Calendar Table')
+)
+
+VAR LastQuarter = CALCULATE(
+    MAX('Calendar Table'[Quater]),
+    ALLSELECTED('Calendar Table'),
+    'Calendar Table'[Year] = LastYear
+)
+
+RETURN
+IF(
+    CurrentYear = LastYear && CurrentQuarter = LastQuarter,
+    [Total Sales],
+    BLANK()
+)
+--------------------------------------------------------------------------
+Tp colour = 
+ 
+  if( [Total Profit]>=0 , "Green","Red")
+
+--------------------------------------------------------------------------
+
+Ts colour = 
+ 
+ var co1 = if( [Total Sales]>=0 , "Green","Red")
+RETURN
+
+  IF(co1="Select Data","#EFEEEA",co1)
+
+-----------------------------------------------------------------------
+YoY % Change Profit Margin = 
+VAR CurrentYearValue = [Profit Margin]
+VAR PreviousYearValue = CALCULATE([Profit Margin], SAMEPERIODLASTYEAR('Calendar Table'[Date]))
+RETURN
+DIVIDE(CurrentYearValue - PreviousYearValue, PreviousYearValue, 0)
+----------------------------------------------------------------------------------------------
+YoY % Change Total Orders = 
+VAR CurrentYearValue = [Total Orders]
+VAR PreviousYearValue = CALCULATE([Total Orders], SAMEPERIODLASTYEAR('Calendar Table'[Date]))
+RETURN
+DIVIDE(CurrentYearValue - PreviousYearValue, PreviousYearValue, 0)
+---------------------------------------------------------------------------------------------
+YoY % Change Total Profit = 
+VAR CurrentYearValue = [Total Profit]
+VAR PreviousYearValue = CALCULATE([Total Profit], SAMEPERIODLASTYEAR('Calendar Table'[Date]))
+RETURN
+DIVIDE(CurrentYearValue - PreviousYearValue, PreviousYearValue, 0)
+-------------------------------------------------------------------------------------------------
+YoY % Change Total Sales = 
+VAR CurrentYearValue = [Total Sales]
+VAR PreviousYearValue = CALCULATE([Total Sales], SAMEPERIODLASTYEAR('Calendar Table'[Date]))
+RETURN
+DIVIDE(CurrentYearValue - PreviousYearValue, PreviousYearValue, 0)
+-----------------------------------------------------------------------------------
+YOY Changes To = VAR num = FORMAT([YoY % Change Total Orders], "+0.0%;-0.0%;0.0%")
+     & " vs. " &
+
+    SELECTEDVALUE('Calendar Table'[Year])-1
+
+    RETURN
+
+    if(SELECTEDVALUE('Calendar Table'[Year])=BLANK() , "Select Data" ,num) 
+---------------------------------------------------------------------------------------------------------
+YOY Changes ToP = VAR num = FORMAT([YoY % Change Total Profit], "+0.0%;-0.0%;0.0%")
+     & " vs. " &
+
+    SELECTEDVALUE('Calendar Table'[Year])-1
+
+    RETURN
+
+    if(SELECTEDVALUE('Calendar Table'[Year])=BLANK() , "Select Data" ,num) 
+--------------------------------------------------------------------------------------------------------
+YOY Changes ToP 3 = 
+VAR SelectedYear = SELECTEDVALUE('Calendar Table'[Year])
+VAR num = FORMAT([YoY % Change Total Profit], "+0.0%;-0.0%;0.0%") & " vs. " & SelectedYear - 1
+VAR AvgYoY = 
+    AVERAGEX(
+        ALL('Calendar Table'[Year]),
+        [YoY % Change Total Profit]
+    )
+VAR AvgNum = FORMAT(AvgYoY, "+0.0%;-0.0%;0.0%") & " (Avg Growth)"
+RETURN
+IF(
+    ISBLANK(SelectedYear),
+    IF(ISBLANK(AvgYoY), "No Data", AvgNum),
+    num
+)
+--------------------------------------------------------------------------------------------------------
+YOY Changes TP = VAR num = FORMAT([YoY % Change Profit Margin], "+0.0%;-0.0%;0.0%")
+     & " vs. " &
+
+    SELECTEDVALUE('Calendar Table'[Year])-1
+
+    RETURN
+
+    if(SELECTEDVALUE('Calendar Table'[Year])=BLANK() , "Select Data" ,num) 
+----------------------------------------------------------------------------------------------------------------
+YOY Changes TP 2 = 
+VAR CurrentProfit = SUM(Orders[Profit]) -- Replace 'Table' and 'Profit' with your actual table and column names
+VAR PreviousProfit = 
+    CALCULATE(
+        SUM(Orders[Profit]),
+        PREVIOUSYEAR('Calendar Table'[Date])
+    )
+VAR YoYChange = 
+    IF(
+        NOT ISBLANK(CurrentProfit) && NOT ISBLANK(PreviousProfit),
+        (CurrentProfit - PreviousProfit) / PreviousProfit,
+        BLANK()
+    )
+VAR Result = 
+    IF(
+        ISBLANK(SELECTEDVALUE('Calendar Table'[Year])),
+        -- When no year is selected, calculate YoY for all years
+        FORMAT(YoYChange, "+0.0%;-0.0%;0.0%") & " (Total Growth)",
+        -- When a year is selected, show YoY for that year
+        FORMAT(YoYChange, "+0.0%;-0.0%;0.0%") & " vs. " & SELECTEDVALUE('Calendar Table'[Year]) - 1
+    )
+RETURN
+Result
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+YOY% Changes PM = 
+VAR SelectedYear = SELECTEDVALUE('Calendar Table'[Year])
+VAR num = FORMAT([YoY % Change Profit Margin], "+0.0%;-0.0%;0.0%") & " vs. " & SelectedYear - 1
+VAR AvgYoY = 
+    AVERAGEX(
+        ALL('Calendar Table'[Year]),
+        [YoY % Change Total Sales]
+    )
+VAR AvgNum = FORMAT(AvgYoY, "+0.0%;-0.0%;0.0%") & " (Avg Growth)"
+RETURN
+IF(
+    ISBLANK(SelectedYear),
+    IF(ISBLANK(AvgYoY), "No Data", AvgNum),
+    num
+)
+----------------------------------------------------------------------------------
+
+YOY% Changes TP = 
+VAR SelectedYear = SELECTEDVALUE('Calendar Table'[Year])
+VAR num = FORMAT([YoY % Change Total Profit], "+0.0%;-0.0%;0.0%") & " vs. " & SelectedYear - 1
+VAR AvgYoY = 
+    AVERAGEX(
+        ALL('Calendar Table'[Year]),
+        [YoY % Change Total Sales]
+    )
+VAR AvgNum = FORMAT(AvgYoY, "+0.0%;-0.0%;0.0%") & " (Avg Growth)"
+RETURN
+IF(
+    ISBLANK(SelectedYear),
+    IF(ISBLANK(AvgYoY), "No Data", AvgNum),
+    num
+)
+
+----------------------------------------------------------------------------------------------------------------
+YOY% Changes TS = 
+VAR num = FORMAT([YoY % Change Total Sales], "+0.0%;-0.0%;0.0%")
+     & " vs. " &
+
+    SELECTEDVALUE('Calendar Table'[Year])-1
+
+    RETURN
+
+    if(SELECTEDVALUE('Calendar Table'[Year])=BLANK() , "Select Data" ,num)
+--------------------------------------------------------------------------------------------------------
+YOY% Changes TS  1 = 
+VAR SelectedYear = SELECTEDVALUE('Calendar Table'[Year])
+VAR num = FORMAT([YoY % Change Total Sales], "+0.0%;-0.0%;0.0%") & " vs. " & SelectedYear - 1
+VAR AvgYoY = 
+    AVERAGEX(
+        ALL('Calendar Table'[Year]),
+        [YoY % Change Total Sales]
+    )
+VAR AvgNum = FORMAT(AvgYoY, "+0.0%;-0.0%;0.0%") & " (Avg Growth)"
+RETURN
+IF(
+    ISBLANK(SelectedYear),
+    IF(ISBLANK(AvgYoY), "No Data", AvgNum),
+    num
+)
+-------------------------------------------------------------------------------------------
+YOY% Changes TS 1 = 
+VAR SelectedYear = SELECTEDVALUE('Calendar Table'[Year])
+VAR num = FORMAT([YoY % Change Total Sales], "+0.0%;-0.0%;0.0%") & " vs. " & SelectedYear - 1
+VAR AvgYoY = 
+    AVERAGEX(
+        ALL('Orders'[Sales]),
+        [YoY % Change Total Sales]
+    )
+VAR AvgNum = FORMAT(AvgYoY, "+0.0%;-0.0%;0.0%") & " (Avg Growth)"
+RETURN
+IF(
+    ISBLANK(SelectedYear),
+    IF(ISBLANK(AvgYoY), "No Data", AvgNum),
+    num
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
